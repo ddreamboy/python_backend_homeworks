@@ -10,7 +10,6 @@
 python -m venv venv
 call venv\Scripts\activate
 pip install -r requirements.txt
-cd src
 uvicorn asgi_app.main:app --reload
 ```
 
@@ -24,7 +23,6 @@ uvicorn asgi_app.main:app --reload
 python3 -m venv venv
 source venv/bin/activate
 pip3 install -r requirements.txt
-cd src
 uvicorn asgi_app.main:app --reload
 ```
 

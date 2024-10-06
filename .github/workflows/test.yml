@@ -1,8 +1,12 @@
 name: Run python tests
 
 on:
-  push
-
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
   build:
@@ -22,3 +26,5 @@ jobs:
         run: pip install -r requirements.txt
       - name: Run homework_2 tests
         run: pytest -vv --showlocals --strict tests/test_homework_2.py
+      - name: Run homework_3 tests
+        run: pytest -vv --showlocals --strict tests/test_homework_3.py

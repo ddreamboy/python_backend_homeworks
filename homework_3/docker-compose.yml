@@ -4,7 +4,7 @@ services:
   shop_api:
     build:
       context: .
-      dockerfile: Dockerfile.server
+      dockerfile: docker/Dockerfile.server
     container_name: shop_api
     ports:
       - "8000:8000"

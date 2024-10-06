@@ -52,7 +52,7 @@ item_id_counter = 0
 @app.get('/')
 def read_root():
     """
-    Возвращает приветственное сообщение.
+    Возвращает приветственное сообщение
     """
     return JSONResponse(
         content={'message': 'Привет, World !'}

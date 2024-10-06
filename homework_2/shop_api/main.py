@@ -4,7 +4,9 @@ from fastapi import FastAPI, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, confloat, conint
 
+
 app = FastAPI()
+
 
 class UpdateItem(BaseModel):
     name: Optional[str] = None
@@ -14,9 +16,11 @@ class UpdateItem(BaseModel):
         'extra': 'forbid'
     }
 
+
 class NewItem(BaseModel):
     name: str
     price: confloat(gt=0)  # type: ignore
+
 
 class Item(BaseModel):
     id: int
@@ -24,22 +28,26 @@ class Item(BaseModel):
     price: confloat(gt=0)  # type: ignore
     deleted: bool = False
 
+
 class CartItem(BaseModel):
     id: int
     name: str
     quantity: conint(gt=0)  # type: ignore
     available: bool
 
+
 class Cart(BaseModel):
     id: int
     items: List[CartItem] = []
     price: float = 0.0
 
-carts = {}
+
+carts: Dict[int, Cart] = {}
 items: Dict[int, Item] = {}
 
 cart_id_counter = 0
 item_id_counter = 0
+
 
 @app.get('/')
 def read_root():
@@ -49,6 +57,7 @@ def read_root():
     return JSONResponse(
         content={'message': 'Привет, World !'}
     )
+
 
 @app.post('/item', status_code=status.HTTP_201_CREATED)
 def create_item(item: NewItem, response: Response):
@@ -67,6 +76,7 @@ def create_item(item: NewItem, response: Response):
     response.headers['location'] = f'/item/{item_id_counter}'
     return new_item.model_dump()
 
+
 @app.post('/cart', status_code=status.HTTP_201_CREATED)
 def create_cart(response: Response):
     """
@@ -78,6 +88,7 @@ def create_cart(response: Response):
     carts[cart_id] = Cart(id=cart_id)
     response.headers['location'] = f'/cart/{cart_id}'
     return {'id': cart_id}
+
 
 @app.post('/cart/{cart_id}/add/{item_id}', status_code=status.HTTP_200_OK)
 def add_item_to_cart(cart_id: int, item_id: int):
@@ -127,6 +138,7 @@ def add_item_to_cart(cart_id: int, item_id: int):
         content={'message': 'Товар добавлен в корзину'}
     )
 
+
 @app.get('/cart/{cart_id}')
 def get_cart_by_id(cart_id: int):
     """
@@ -138,6 +150,7 @@ def get_cart_by_id(cart_id: int):
             detail='Такой корзины нету :('
         )
     return carts[cart_id]
+
 
 @app.get('/cart')
 def get_carts(
@@ -160,6 +173,7 @@ def get_carts(
     ]
     return filtered_carts[offset:offset + limit]
 
+
 @app.get('/item/{id}')
 def get_item_by_id(id: int):
     """
@@ -178,6 +192,7 @@ def get_item_by_id(id: int):
         )
 
     return items[id]
+
 
 @app.get('/item')
 def get_item(
@@ -198,6 +213,7 @@ def get_item(
     ]
     return filtered_items[offset:offset + limit]
 
+
 @app.put('/item/{id}')
 def put_item_by_id(id: int, new_item: NewItem):
     """
@@ -214,6 +230,7 @@ def put_item_by_id(id: int, new_item: NewItem):
     item.price = new_item.price
 
     return item
+
 
 @app.patch('/item/{id}')
 def patch_item_by_id(id: int, update_item: UpdateItem):
@@ -240,6 +257,7 @@ def patch_item_by_id(id: int, update_item: UpdateItem):
         item.price = update_item.price
 
     return item
+
 
 @app.delete('/item/{id}')
 def delete_item(id: int):

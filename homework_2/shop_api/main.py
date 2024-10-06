@@ -204,7 +204,7 @@ def get_item(
     show_deleted: bool = Query(False)
 ):
     """
-    Возвращает список товаров с возможностью фильтрации и пагинации
+    Возвращает список товаров с возможностью фильтрации и пагинации.
     """
     filtered_items = [
         item for item in items.values()

@@ -4,7 +4,7 @@ from typing import List, Optional, Dict
 from fastapi import FastAPI, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, confloat, conint
-from prometheus_client import Counter, Gauge, Histogram, Summary, generate_latest, REGISTRY
+from prometheus_client import Counter, generate_latest, REGISTRY
 
 
 app = FastAPI()
@@ -12,7 +12,6 @@ app = FastAPI()
 # Метрики
 request_counter = Counter('requests_total', 'Total number of requests')
 error_counter = Counter('errors_total', 'Total number of errors')
-request_duration_histogram = Histogram('request_duration_seconds', 'Histogram of request duration in seconds')
 
 
 class UpdateItem(BaseModel):
@@ -98,7 +97,7 @@ def create_cart(response: Response):
     cart_id = cart_id_counter
     carts[cart_id] = Cart(id=cart_id)
     response.headers['location'] = f'/cart/{cart_id}'
-    
+
     request_counter.inc()
 
     return {'id': cart_id}
@@ -118,7 +117,7 @@ def add_item_to_cart(cart_id: int, item_id: int):
     if item_id not in items:
         error_counter.inc()
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, 
+            status_code=status.HTTP_404_NOT_FOUND,
             detail='Такого товара нету :('
         )
 
@@ -135,10 +134,10 @@ def add_item_to_cart(cart_id: int, item_id: int):
     existing_item = next(
         (
             cart_item for cart_item in cart.items if cart_item.id == item_id
-        ), 
+        ),
         None
     )
-    
+
     if existing_item:
         existing_item.quantity += 1
     else:
@@ -151,9 +150,9 @@ def add_item_to_cart(cart_id: int, item_id: int):
         cart.items.append(cart_item)
 
     cart.price += item.price
-    
+
     request_counter.inc()
-    
+
     return JSONResponse(
         content={'message': 'Товар добавлен в корзину'}
     )
@@ -170,9 +169,9 @@ def get_cart_by_id(cart_id: int):
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Такой корзины нету :('
         )
-        
+
     request_counter.inc()
-    
+
     return carts[cart_id]
 
 
@@ -195,9 +194,9 @@ def get_carts(
            (min_quantity is None or sum(item.quantity for item in cart.items) >= min_quantity) and
            (max_quantity is None or sum(item.quantity for item in cart.items) <= max_quantity)
     ]
-    
+
     request_counter.inc()
-    
+
     return filtered_carts[offset:offset + limit]
 
 
@@ -212,16 +211,16 @@ def get_item_by_id(id: int):
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Такого товара нету :('
         )
-        
+
     if items[id].deleted:
         error_counter.inc()
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Товар удален'
         )
-    
+
     request_counter.inc()
-    
+
     return items[id]
 
 
@@ -242,9 +241,9 @@ def get_item(
            (max_price is None or item.price <= max_price) and
            (show_deleted or not item.deleted)
     ]
-    
+
     request_counter.inc()
-    
+
     return filtered_items[offset:offset + limit]
 
 
@@ -259,13 +258,13 @@ def put_item_by_id(id: int, new_item: NewItem):
             status_code=status.HTTP_404_NOT_FOUND,
             detail='Товара не существует. Только замена существующего :('
         )
-        
+
     item = items[id]
     item.name = new_item.name
     item.price = new_item.price
 
     request_counter.inc()
-    
+
     return item
 
 
@@ -296,7 +295,7 @@ def patch_item_by_id(id: int, update_item: UpdateItem):
         item.price = update_item.price
 
     request_counter.inc()
-    
+
     return item
 
 
@@ -313,9 +312,9 @@ def delete_item(id: int):
         )
     item = items[id]
     item.deleted = True
-    
+
     request_counter.inc()
-    
+
     return {'message': 'Товар удален'}
 
 

@@ -63,7 +63,7 @@ def read_root():
 @app.post('/item', status_code=status.HTTP_201_CREATED)
 def create_item(item: NewItem, response: Response):
     """
-    Создает новый товар и возвращает его.
+    Создает новый товар и возвращает его
     """
     global item_id_counter
     item_id_counter += 1
@@ -81,7 +81,7 @@ def create_item(item: NewItem, response: Response):
 @app.post('/cart', status_code=status.HTTP_201_CREATED)
 def create_cart(response: Response):
     """
-    Создает новую корзину и возвращает её ID.
+    Создает новую корзину и возвращает её ID
     """
     global cart_id_counter
     cart_id_counter += 1
@@ -94,7 +94,7 @@ def create_cart(response: Response):
 @app.post('/cart/{cart_id}/add/{item_id}', status_code=status.HTTP_200_OK)
 def add_item_to_cart(cart_id: int, item_id: int):
     """
-    Добавляет товар в корзину по ID корзины и ID товара.
+    Добавляет товар в корзину по ID корзины и ID товара
     """
     if cart_id not in carts:
         raise HTTPException(
@@ -163,7 +163,7 @@ def get_carts(
     max_quantity: int | None = Query(None, ge=0)
 ):
     """
-    Возвращает список корзин с возможностью фильтрации и пагинации.
+    Возвращает список корзин с возможностью фильтрации и пагинации
     """
     filtered_carts = [
         cart for cart in carts.values()
@@ -178,7 +178,7 @@ def get_carts(
 @app.get('/item/{id}')
 def get_item_by_id(id: int):
     """
-    Возвращает товар по его ID.
+    Возвращает товар по его ID
     """
     if id not in items:
         raise HTTPException(
@@ -204,7 +204,7 @@ def get_item(
     show_deleted: bool = Query(False)
 ):
     """
-    Возвращает список товаров с возможностью фильтрации и пагинации.
+    Возвращает список товаров с возможностью фильтрации и пагинации
     """
     filtered_items = [
         item for item in items.values()
@@ -263,7 +263,7 @@ def patch_item_by_id(id: int, update_item: UpdateItem):
 @app.delete('/item/{id}')
 def delete_item(id: int):
     """
-    Удаляет товар по его ID.
+    Удаляет товар по его ID
     """
     if id not in items:
         raise HTTPException(

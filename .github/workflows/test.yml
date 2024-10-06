@@ -20,9 +20,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install poetry
-        uses: abatilo/actions-poetry@v2
-      - name: Install dependencies with poetry
-        run: poetry install
+      - name: Install dependencies
+        run: pip install -r requirements.txt
       - name: Run tests
-        run: poetry run pytest -vv --strict --showlocals
+        run: pytest -vv --strict --showlocals

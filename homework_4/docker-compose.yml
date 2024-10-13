@@ -1,0 +1,54 @@
+version: "3.9"
+
+services:
+  demo_service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    container_name: demo_service
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/service
+    working_dir: /service
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus:/etc/prometheus/
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-remote-write-receiver"
+    restart: always
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+
+  k6:
+    image: grafana/k6
+    container_name: k6
+    volumes:
+      - ./k6:/scripts
+      - ./k6/results:/results
+    environment:
+      - K6_PROMETHEUS_RW_SERVER_URL=http://prometheus:9090/api/v1/write
+      - K6_PROMETHEUS_RW_TREND_STATS=p(95),p(99),min,max,avg
+    command: run --out experimental-prometheus-rw /scripts/load_test.js
+    depends_on:
+      - prometheus
+
+volumes:
+  grafana_storage:

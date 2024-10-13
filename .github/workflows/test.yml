@@ -28,3 +28,5 @@ jobs:
         run: pytest -vv --showlocals --strict tests/test_homework_2.py
       - name: Run homework_3 tests
         run: pytest -vv --showlocals --strict tests/test_homework_3.py
+      - name: Run homework_4 tests
+        run: pytest -vv --strict --showlocals --cov=homework_4/demo_service tests/test_homework_4.py
